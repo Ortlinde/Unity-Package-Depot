@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Unity Packages</title>
+	<meta name="description" content="Drop-in tools for the Unity Editor, installable from a Git URL." />
+
+	<!-- ============================================================= -->
+	<!--  EDIT EVERYTHING IN THE <script id="data"> BLOCK NEAR THE END  -->
+	<!-- ============================================================= -->
+
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link
+		href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+		rel="stylesheet" />
+
+	<style>
+		:root {
+			--ink: #0e1116;
+			--panel: #151a21;
+			--panel-2: #1b212a;
+			--line: #262d38;
+			--line-soft: #1e242d;
+			--text: #e8edf2;
+			--muted: #8a96a3;
+			--muted-dim: #6b7682;
+			--accent: #ffb454;
+			--accent-soft: rgba(255, 180, 84, 0.12);
+			--accent-line: rgba(255, 180, 84, 0.32);
+			--ok: #5fd38a;
+
+			--mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+			--sans: "IBM Plex Sans", system-ui, sans-serif;
+			--display: "Space Grotesk", system-ui, sans-serif;
+
+			--maxw: 760px;
+			--radius: 12px;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		html {
+			scroll-behavior: smooth;
+		}
+
+		body {
+			margin: 0;
+			background: var(--ink);
+			color: var(--text);
+			font-family: var(--sans);
+			font-size: 16px;
+			line-height: 1.6;
+			-webkit-font-smoothing: antialiased;
+			background-image:
+				linear-gradient(var(--line-soft) 1px, transparent 1px),
+				linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+			background-size: 48px 48px;
+			background-position: -1px -1px;
+		}
+
+		body::before {
+			content: "";
+			position: fixed;
+			inset: 0;
+			pointer-events: none;
+			background: radial-gradient(120% 80% at 50% 0%, transparent 40%, var(--ink) 100%);
+		}
+
+		.wrap {
+			position: relative;
+			max-width: var(--maxw);
+			margin: 0 auto;
+			padding: 0 22px;
+		}
+
+		a {
+			color: inherit;
+		}
+
+		/* ---------- masthead ---------- */
+		header.mast {
+			position: relative;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 22px 0 0;
+		}
+
+		.brand {
+			display: flex;
+			align-items: center;
+			gap: 11px;
+			font-family: var(--mono);
+			font-size: 13px;
+			letter-spacing: 0.04em;
+			color: var(--muted);
+		}
+
+		.brand svg {
+			display: block;
+		}
+
+		.brand b {
+			color: var(--text);
+			font-weight: 500;
+		}
+
+		.mast-link {
+			font-family: var(--mono);
+			font-size: 12.5px;
+			color: var(--muted);
+			text-decoration: none;
+			border: 1px solid var(--line);
+			border-radius: 999px;
+			padding: 6px 13px;
+			transition: border-color .18s, color .18s;
+		}
+
+		.mast-link:hover {
+			color: var(--text);
+			border-color: var(--accent-line);
+		}
+
+		/* ---------- hero ---------- */
+		.hero {
+			padding: 64px 0 40px;
+		}
+
+		.eyebrow {
+			font-family: var(--mono);
+			font-size: 12.5px;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+			color: var(--accent);
+			margin: 0 0 18px;
+		}
+
+		h1 {
+			font-family: var(--display);
+			font-weight: 700;
+			font-size: clamp(40px, 8vw, 64px);
+			line-height: 1.02;
+			letter-spacing: -0.02em;
+			margin: 0 0 18px;
+		}
+
+		.lede {
+			font-size: 18px;
+			color: var(--muted);
+			max-width: 46ch;
+			margin: 0;
+		}
+
+		/* ---------- install note ---------- */
+		.howto {
+			margin-top: 34px;
+			border: 1px solid var(--line);
+			border-radius: var(--radius);
+			background: linear-gradient(180deg, var(--panel) 0%, var(--ink) 130%);
+			padding: 20px 22px;
+		}
+
+		.howto h2 {
+			font-family: var(--mono);
+			font-size: 12px;
+			letter-spacing: 0.1em;
+			text-transform: uppercase;
+			color: var(--muted);
+			margin: 0 0 14px;
+		}
+
+		.steps {
+			list-style: none;
+			counter-reset: step;
+			margin: 0;
+			padding: 0;
+			display: grid;
+			gap: 10px;
+		}
+
+		.steps li {
+			counter-increment: step;
+			position: relative;
+			padding-left: 34px;
+			font-size: 14.5px;
+			color: var(--text);
+		}
+
+		.steps li::before {
+			content: counter(step);
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 22px;
+			height: 22px;
+			border-radius: 6px;
+			background: var(--accent-soft);
+			border: 1px solid var(--accent-line);
+			color: var(--accent);
+			font-family: var(--mono);
+			font-size: 12px;
+			display: grid;
+			place-items: center;
+		}
+
+		.steps code,
+		.lede code {
+			font-family: var(--mono);
+			font-size: 0.92em;
+			background: var(--panel-2);
+			border: 1px solid var(--line);
+			padding: 1px 6px;
+			border-radius: 5px;
+		}
+
+		/* ---------- category chips (browse by purpose) ---------- */
+		.chips {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 9px;
+			margin: 54px 0 18px;
+		}
+
+		.chip {
+			font-family: var(--mono);
+			font-size: 12.5px;
+			color: var(--muted);
+			background: var(--panel);
+			border: 1px solid var(--line);
+			border-radius: 999px;
+			padding: 7px 14px;
+			cursor: pointer;
+			display: inline-flex;
+			align-items: center;
+			gap: 7px;
+			transition: border-color .16s, color .16s, background .16s;
+		}
+
+		.chip:hover {
+			color: var(--text);
+			border-color: var(--accent-line);
+		}
+
+		.chip .n {
+			color: var(--muted-dim);
+			font-size: 11.5px;
+		}
+
+		.chip.active {
+			color: var(--accent);
+			background: var(--accent-soft);
+			border-color: var(--accent-line);
+		}
+
+		.chip.active .n {
+			color: var(--accent);
+			opacity: .7;
+		}
+
+		/* ---------- text filter (search by name) ---------- */
+		.filter-row {
+			display: flex;
+			align-items: center;
+			gap: 14px;
+			margin: 0 0 30px;
+		}
+
+		.filter {
+			flex: 1;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			border: 1px solid var(--line);
+			border-radius: 10px;
+			padding: 0 14px;
+			background: var(--panel);
+			transition: border-color .18s;
+		}
+
+		.filter:focus-within {
+			border-color: var(--accent-line);
+		}
+
+		.filter svg {
+			color: var(--muted-dim);
+			flex: none;
+		}
+
+		.filter input {
+			flex: 1;
+			background: none;
+			border: none;
+			outline: none;
+			color: var(--text);
+			font-family: var(--mono);
+			font-size: 14px;
+			padding: 12px 0;
+		}
+
+		.filter input::placeholder {
+			color: var(--muted-dim);
+		}
+
+		.count {
+			font-family: var(--mono);
+			font-size: 12.5px;
+			color: var(--muted-dim);
+			white-space: nowrap;
+		}
+
+		/* ---------- sections ---------- */
+		.catalog {
+			padding-bottom: 12px;
+		}
+
+		.section {
+			margin-bottom: 36px;
+		}
+
+		.section.hidden {
+			display: none;
+		}
+
+		.section-head {
+			display: flex;
+			align-items: baseline;
+			gap: 12px;
+			margin: 0 0 16px;
+			padding-bottom: 11px;
+			border-bottom: 1px solid var(--line-soft);
+		}
+
+		.section-head h2 {
+			font-family: var(--mono);
+			font-size: 12px;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+			color: var(--accent);
+			margin: 0;
+		}
+
+		.section-head .n {
+			font-family: var(--mono);
+			font-size: 12px;
+			color: var(--muted-dim);
+		}
+
+		.cards {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr);
+			gap: 16px;
+		}
+
+		/* ---------- package cards ---------- */
+		.pkg {
+			min-width: 0;
+			border: 1px solid var(--line);
+			border-radius: var(--radius);
+			background: var(--panel);
+			padding: 22px;
+			transition: border-color .2s, background .2s;
+		}
+
+		.pkg:hover {
+			border-color: var(--accent-line);
+			background: var(--panel-2);
+		}
+
+		.pkg.hidden {
+			display: none;
+		}
+
+		.pkg-head {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			flex-wrap: wrap;
+			margin-bottom: 6px;
+		}
+
+		.pkg-id {
+			font-family: var(--mono);
+			font-size: 15px;
+			color: var(--text);
+			word-break: break-all;
+			margin-right: auto;
+		}
+
+		.ver {
+			font-family: var(--mono);
+			font-size: 11.5px;
+			color: var(--accent);
+			background: var(--accent-soft);
+			border: 1px solid var(--accent-line);
+			border-radius: 999px;
+			padding: 2px 9px;
+			white-space: nowrap;
+		}
+
+		/* auto-applied when a package's version is below 1.0.0 (or has a -alpha/-beta/-rc suffix) */
+		.beta {
+			font-family: var(--mono);
+			font-size: 11px;
+			color: #ff9b76;
+			background: rgba(255, 122, 89, 0.12);
+			border: 1px solid rgba(255, 122, 89, 0.34);
+			border-radius: 999px;
+			padding: 2px 9px;
+			white-space: nowrap;
+			display: inline-flex;
+			align-items: center;
+			gap: 5px;
+		}
+
+		.beta::before {
+			content: "";
+			width: 5px;
+			height: 5px;
+			border-radius: 50%;
+			background: #ff7a59;
+		}
+
+		.cat-pill {
+			font-family: var(--mono);
+			font-size: 11px;
+			color: var(--muted);
+			background: var(--panel-2);
+			border: 1px solid var(--line);
+			border-radius: 999px;
+			padding: 3px 10px;
+			cursor: pointer;
+			white-space: nowrap;
+			transition: color .15s, border-color .15s;
+		}
+
+		.cat-pill:hover {
+			color: var(--accent);
+			border-color: var(--accent-line);
+		}
+
+		.pkg-name {
+			font-family: var(--display);
+			font-weight: 500;
+			font-size: 13px;
+			letter-spacing: 0.02em;
+			color: var(--muted);
+			margin-bottom: 4px;
+		}
+
+		.pkg-desc {
+			font-size: 14.5px;
+			color: var(--muted);
+			margin: 0 0 18px;
+		}
+
+		/* the signature element: a faux "Add package from git URL" field */
+		.copybar {
+			display: flex;
+			align-items: stretch;
+			border: 1px solid var(--line);
+			border-radius: 9px;
+			overflow: hidden;
+			background: var(--ink);
+		}
+
+		.copybar .url {
+			flex: 1;
+			min-width: 0;
+			font-family: var(--mono);
+			font-size: 13px;
+			color: var(--text);
+			padding: 12px 14px;
+			overflow-x: auto;
+			white-space: nowrap;
+			scrollbar-width: thin;
+		}
+
+		.copybar .url::-webkit-scrollbar {
+			height: 0;
+		}
+
+		.copy-btn {
+			flex: none;
+			display: inline-flex;
+			align-items: center;
+			gap: 7px;
+			border: none;
+			border-left: 1px solid var(--line);
+			background: var(--panel-2);
+			color: var(--accent);
+			font-family: var(--mono);
+			font-size: 12.5px;
+			padding: 0 16px;
+			cursor: pointer;
+			transition: background .15s, color .15s;
+		}
+
+		.copy-btn:hover {
+			background: var(--accent-soft);
+		}
+
+		.copy-btn.done {
+			color: var(--ok);
+		}
+
+		.copy-btn svg {
+			display: block;
+		}
+
+		.pkg-links {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 18px;
+			margin-top: 16px;
+		}
+
+		.pkg-links a {
+			font-family: var(--mono);
+			font-size: 12.5px;
+			color: var(--muted);
+			text-decoration: none;
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			transition: color .15s;
+		}
+
+		.pkg-links a:hover {
+			color: var(--accent);
+		}
+
+		.pkg-links a::after {
+			content: "↗";
+			font-size: 11px;
+			color: var(--muted-dim);
+		}
+
+		.pkg-note {
+			font-family: var(--mono);
+			font-size: 11.5px;
+			color: var(--muted-dim);
+			margin-top: 12px;
+			line-height: 1.5;
+		}
+
+		.empty {
+			text-align: center;
+			color: var(--muted-dim);
+			font-family: var(--mono);
+			font-size: 13px;
+			padding: 48px 0;
+		}
+
+		.empty.hidden {
+			display: none;
+		}
+
+		/* ---------- footer ---------- */
+		footer {
+			margin-top: 48px;
+			padding: 28px 0 56px;
+			border-top: 1px solid var(--line-soft);
+			display: flex;
+			justify-content: space-between;
+			flex-wrap: wrap;
+			gap: 12px;
+			font-family: var(--mono);
+			font-size: 12.5px;
+			color: var(--muted-dim);
+		}
+
+		footer a {
+			color: var(--muted);
+			text-decoration: none;
+		}
+
+		footer a:hover {
+			color: var(--accent);
+		}
+
+		/* ---------- load animation ---------- */
+		.reveal {
+			opacity: 0;
+			transform: translateY(12px);
+		}
+
+		.reveal.in {
+			animation: rise .5s cubic-bezier(.2, .7, .2, 1) forwards;
+		}
+
+		@keyframes rise {
+			to {
+				opacity: 1;
+				transform: none;
+			}
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			* {
+				animation: none !important;
+				transition: none !important;
+			}
+
+			.reveal {
+				opacity: 1;
+				transform: none;
+			}
+
+			html {
+				scroll-behavior: auto;
+			}
+		}
+
+		@media (max-width: 560px) {
+			.hero {
+				padding: 44px 0 30px;
+			}
+
+			.copy-btn span {
+				display: none;
+			}
+
+			.copy-btn {
+				padding: 0 14px;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div class="wrap">
+
+		<header class="mast">
+			<div class="brand">
+				<svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+					<path d="M12 2 21 7v10l-9 5-9-5V7l9-5Z" stroke="var(--accent)" stroke-width="1.4" stroke-linejoin="round" />
+					<path d="M12 2v10m0 0 9-5m-9 5-9-5" stroke="var(--accent)" stroke-width="1.4" stroke-linejoin="round"
+						opacity=".55" />
+				</svg>
+				<span><b id="brand-name">unitypackages</b></span>
+			</div>
+			<a class="mast-link" id="profile-link" href="#" target="_blank" rel="noopener">GitHub →</a>
+		</header>
+
+		<section class="hero">
+			<p class="eyebrow" id="eyebrow">Unity Package Index</p>
+			<h1 id="title">Unity Packages</h1>
+			<p class="lede" id="lede"></p>
+
+			<div class="howto">
+				<h2>Install from a Git URL</h2>
+				<ol class="steps">
+					<li>In Unity, open <code>Window ▸ Package Manager</code>.</li>
+					<li>Click <code>+</code> ▸ <code>Add package from git URL…</code></li>
+					<li>Paste a URL below and press <code>Add</code>.</li>
+				</ol>
+			</div>
+		</section>
+
+		<!-- browse by purpose -->
+		<nav class="chips" id="chips" aria-label="Filter by category"></nav>
+
+		<!-- search by name -->
+		<div class="filter-row">
+			<label class="filter">
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+					<circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6" />
+					<path d="m20 20-3.2-3.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+				</svg>
+				<input id="filter" type="text" placeholder="search by name…" autocomplete="off" spellcheck="false"
+					aria-label="Search packages by name" />
+			</label>
+			<span class="count" id="count"></span>
+		</div>
+
+		<main class="catalog" id="list"></main>
+		<p class="empty hidden" id="empty">Nothing matches that filter.</p>
+
+		<footer>
+			<span id="foot-left"></span>
+			<a id="foot-link" href="#" target="_blank" rel="noopener">View all repos on GitHub →</a>
+		</footer>
+	</div>
+
+	<!-- =================================================================== -->
+	<!--  YOUR DATA — edit CONFIG and PACKAGES, then commit. Nothing else.    -->
+	<!-- =================================================================== -->
+	<script id="data">
+		const CONFIG = {
+			handle: "your-username",
+			profileUrl: "https://github.com/your-username",
+			title: "Unity Packages",
+			lede: "A small collection of drop-in tools for the Unity Editor. Each one installs straight from the Package Manager — no registry setup required.",
+			// Text shown automatically on any package whose version is below 1.0.0.
+			// Change to "測試中" (or anything you like) to localize.
+			betaLabel: "Pre-release",
+		};
+
+		// One object per package.
+		//   id        : com.author.package name from package.json   (shown big)
+		//   category  : the purpose it belongs to. Drives the section
+		//               heading AND the filter chip. Pick ONE primary
+		//               purpose per package. Sections appear in the order
+		//               categories first show up in this list.
+		//   name      : human-friendly name        (small label)
+		//   desc      : one sentence               (what it does)
+		//   gitUrl    : the EXACT string pasted into Package Manager (the hero)
+		//   repo / docs / changelog : optional links
+		//   version   : pill text, e.g. "v1.2.0"   (optional)
+		//   note      : small print, e.g. dependency hints (optional)
+		//
+		// gitUrl recipes:
+		//   • package at repo root ....... https://github.com/you/repo.git
+		//   • package in a subfolder ..... https://github.com/you/repo.git?path=/Packages/com.you.thing
+		//   • pin a released tag ......... append  #v1.2.0   (or  #main  for a branch)
+		const PACKAGES = [
+			{
+				id: "com.yourname.tween",
+				category: "Animation",
+				name: "Tween",
+				desc: "Allocation-free tweening with a fluent, chainable API.",
+				gitUrl: "https://github.com/your-username/unity-tween.git",
+				repo: "https://github.com/your-username/unity-tween",
+				docs: "https://github.com/your-username/unity-tween#readme",
+				version: "v1.2.0",
+			},
+			{
+				id: "com.yourname.spline",
+				category: "Animation",
+				name: "Spline",
+				desc: "Catmull-Rom splines with sampling and path following.",
+				gitUrl: "https://github.com/your-username/unity-spline.git",
+				repo: "https://github.com/your-username/unity-spline",
+				version: "v0.6.0",
+			},
+			{
+				id: "com.yourname.editorhud",
+				category: "Editor Tools",
+				name: "Editor HUD",
+				desc: "On-screen runtime debug overlay, driven from any script.",
+				gitUrl: "https://github.com/your-username/unity-editorhud.git",
+				repo: "https://github.com/your-username/unity-editorhud",
+				version: "v2.0.0",
+			},
+			{
+				id: "com.yourname.hierarchyicons",
+				category: "Editor Tools",
+				name: "Hierarchy Icons",
+				desc: "Shows component icons next to objects in the Hierarchy.",
+				gitUrl: "https://github.com/your-username/unity-hierarchyicons.git",
+				repo: "https://github.com/your-username/unity-hierarchyicons",
+				version: "v1.1.0",
+			},
+			{
+				id: "com.yourname.savesystem",
+				category: "Persistence",
+				name: "Save System",
+				desc: "Versioned, encrypted save slots with async read/write.",
+				gitUrl: "https://github.com/your-username/unity-save.git?path=/Packages/com.yourname.savesystem#v0.9.1",
+				repo: "https://github.com/your-username/unity-save",
+				changelog: "https://github.com/your-username/unity-save/blob/main/CHANGELOG.md",
+				version: "v0.9.1",
+				note: "Depends on com.unity.nuget.newtonsoft-json — add it first if your project doesn't already have it.",
+			},
+			{
+				id: "com.yourname.objectpool",
+				category: "Runtime Utilities",
+				name: "Object Pool",
+				desc: "Typed, auto-expanding pooling for GameObjects and classes.",
+				gitUrl: "https://github.com/your-username/unity-objectpool.git",
+				repo: "https://github.com/your-username/unity-objectpool",
+				version: "v1.0.3",
+			},
+		];
+	</script>
+
+	<script>
+		(function () {
+			// ---- static config ----
+			document.getElementById("brand-name").textContent = CONFIG.handle;
+			document.getElementById("title").textContent = CONFIG.title;
+			document.getElementById("lede").textContent = CONFIG.lede;
+			document.title = CONFIG.title;
+			const prof = CONFIG.profileUrl;
+			document.getElementById("profile-link").href = prof;
+			document.getElementById("foot-link").href = prof;
+			document.getElementById("foot-left").textContent =
+				"© " + new Date().getFullYear() + " · @" + CONFIG.handle;
+
+			const listEl = document.getElementById("list");
+			const chipsEl = document.getElementById("chips");
+			const countEl = document.getElementById("count");
+			const emptyEl = document.getElementById("empty");
+			const input = document.getElementById("filter");
+
+			let activeCat = null; // null = All
+			let query = "";
+
+			const esc = (s) =>
+				String(s).replace(/[&<>"']/g, (c) =>
+					({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
+				);
+
+			// A version counts as "pre-release" if its core is below 1.0.0
+			// (i.e. major version is 0, like 0.9.1) OR it carries a
+			// -alpha / -beta / -rc suffix (like 1.0.0-rc.2).
+			function isPreRelease(version) {
+				if (!version) return false;
+				const v = String(version).trim().replace(/^v/i, "");
+				const core = v.split("+")[0]; // drop build metadata
+				if (core.includes("-")) return true; // has a pre-release tag
+				const major = parseInt(core.split(".")[0], 10);
+				return Number.isFinite(major) && major < 1;
+			}
+
+			// ---- icons ----
+			const copyIcon =
+				'<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M5 15V5a2 2 0 0 1 2-2h10" stroke="currentColor" stroke-width="1.6"/></svg>';
+			const okIcon =
+				'<svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="m5 13 4 4 10-11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+			// ---- derive categories in first-appearance order ----
+			const cats = [];
+			PACKAGES.forEach((p) => {
+				p._cat = p.category || "Other";
+				if (!cats.includes(p._cat)) cats.push(p._cat);
+			});
+			const countOf = (c) => PACKAGES.filter((p) => p._cat === c).length;
+
+			// ---- chips ----
+			function makeChip(label, cat, n) {
+				const b = document.createElement("button");
+				b.type = "button";
+				b.className = "chip";
+				b.dataset.cat = cat == null ? "" : cat;
+				b.innerHTML = esc(label) + ' <span class="n">' + n + "</span>";
+				b.addEventListener("click", () => {
+					activeCat = activeCat === cat ? null : cat; // click active chip to clear
+					apply();
+				});
+				return b;
+			}
+			chipsEl.appendChild(makeChip("All", null, PACKAGES.length));
+			cats.forEach((c) => chipsEl.appendChild(makeChip(c, c, countOf(c))));
+
+			// ---- one card ----
+			function card(p, i) {
+				const el = document.createElement("article");
+				el.className = "pkg reveal";
+				el.style.animationDelay = i * 50 + "ms";
+				el.dataset.search = (p.id + " " + (p.name || "") + " " + (p.desc || "") + " " + (p._cat || "") + (isPreRelease(p.version) ? " pre-release beta " + (CONFIG.betaLabel || "") : "")).toLowerCase();
+
+				const links = [];
+				if (p.repo) links.push(`<a href="${esc(p.repo)}" target="_blank" rel="noopener">Repo</a>`);
+				if (p.docs) links.push(`<a href="${esc(p.docs)}" target="_blank" rel="noopener">Docs</a>`);
+				if (p.changelog) links.push(`<a href="${esc(p.changelog)}" target="_blank" rel="noopener">Changelog</a>`);
+
+				el.innerHTML = `
+					<div class="pkg-head">
+						<span class="pkg-id">${esc(p.id)}</span>
+						<button class="cat-pill" type="button" data-cat="${esc(p._cat)}">${esc(p._cat)}</button>
+						${p.version ? `<span class="ver">${esc(p.version)}</span>` : ""}
+						${isPreRelease(p.version) ? `<span class="beta">${esc(CONFIG.betaLabel || "Pre-release")}</span>` : ""}
+					</div>
+					${p.name ? `<div class="pkg-name">${esc(p.name)}</div>` : ""}
+					${p.desc ? `<p class="pkg-desc">${esc(p.desc)}</p>` : ""}
+					<div class="copybar">
+						<div class="url" tabindex="0">${esc(p.gitUrl)}</div>
+						<button class="copy-btn" type="button" aria-label="Copy install URL">${copyIcon}<span>Copy</span></button>
+					</div>
+					${links.length ? `<div class="pkg-links">${links.join("")}</div>` : ""}
+					${p.note ? `<p class="pkg-note">⚑ ${esc(p.note)}</p>` : ""}
+				`;
+
+				el.querySelector(".copy-btn").addEventListener("click", () => copy(p.gitUrl, el.querySelector(".copy-btn")));
+				el.querySelector(".cat-pill").addEventListener("click", () => {
+					activeCat = p._cat;
+					apply();
+					chipsEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+				});
+				return el;
+			}
+
+			// ---- copy with fallback ----
+			function copy(text, btn) {
+				const done = () => {
+					btn.classList.add("done");
+					btn.innerHTML = okIcon + "<span>Copied</span>";
+					setTimeout(() => {
+						btn.classList.remove("done");
+						btn.innerHTML = copyIcon + "<span>Copy</span>";
+					}, 1500);
+				};
+				if (navigator.clipboard && navigator.clipboard.writeText) {
+					navigator.clipboard.writeText(text).then(done).catch(() => fallback(text, done));
+				} else {
+					fallback(text, done);
+				}
+			}
+			function fallback(text, done) {
+				const t = document.createElement("textarea");
+				t.value = text;
+				t.style.position = "fixed";
+				t.style.opacity = "0";
+				document.body.appendChild(t);
+				t.select();
+				try { document.execCommand("copy"); done(); } catch (e) { }
+				document.body.removeChild(t);
+			}
+
+			// ---- build sections ----
+			cats.forEach((c) => {
+				const sec = document.createElement("section");
+				sec.className = "section";
+				sec.dataset.cat = c;
+				sec.innerHTML =
+					`<div class="section-head"><h2>${esc(c)}</h2><span class="n" data-secn></span></div><div class="cards"></div>`;
+				const wrap = sec.querySelector(".cards");
+				PACKAGES.filter((p) => p._cat === c).forEach((p, i) => wrap.appendChild(card(p, i)));
+				listEl.appendChild(sec);
+			});
+
+			// ---- combined filter: category AND text ----
+			function apply() {
+				document.querySelectorAll(".chip").forEach((ch) =>
+					ch.classList.toggle("active", ch.dataset.cat === (activeCat || ""))
+				);
+
+				let shown = 0;
+				document.querySelectorAll(".section").forEach((sec) => {
+					const catMatch = !activeCat || sec.dataset.cat === activeCat;
+					let inSec = 0;
+					sec.querySelectorAll(".pkg").forEach((n) => {
+						const textMatch = !query || n.dataset.search.includes(query);
+						const show = catMatch && textMatch;
+						n.classList.toggle("hidden", !show);
+						if (show) inSec++;
+					});
+					sec.classList.toggle("hidden", inSec === 0);
+					const sn = sec.querySelector("[data-secn]");
+					if (sn) sn.textContent = inSec;
+					shown += inSec;
+				});
+
+				emptyEl.classList.toggle("hidden", shown !== 0);
+				countEl.textContent =
+					shown + " / " + PACKAGES.length + " package" + (PACKAGES.length === 1 ? "" : "s");
+			}
+
+			input.addEventListener("input", () => {
+				query = input.value.trim().toLowerCase();
+				apply();
+			});
+
+			apply();
+			requestAnimationFrame(() =>
+				document.querySelectorAll(".reveal").forEach((n) => n.classList.add("in"))
+			);
+		})();
+	</script>
+</body>
+
+</html>
