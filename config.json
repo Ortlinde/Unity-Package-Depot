@@ -1,0 +1,8 @@
+{
+    "handle": "Ortlinde",
+    "profileUrl": "https://github.com/Ortlinde",
+    "title": "Unity Packages",
+    "lede": "A small collection of drop-in tools for the Unity Editor. Each one installs straight from the Package Manager — no registry setup required.",
+    "betaLabel": "Pre-release",
+    "scanTopic": "unity-package"
+}

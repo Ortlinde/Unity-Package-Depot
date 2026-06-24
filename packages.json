@@ -1,0 +1,41 @@
+{
+    "meta": {
+        "generatedAt": "2026-06-24T00:00:00.000Z",
+        "count": 3,
+        "source": "placeholder - replaced on the first GitHub Actions run"
+    },
+    "packages": [
+        {
+            "id": "com.ortlinde.movement",
+            "name": "Ortlinde Movement",
+            "desc": "Character movement controllers with configurable acceleration curves.",
+            "version": "v0.1.0",
+            "gitUrl": "https://github.com/Ortlinde/com.ortlinde.movement.git",
+            "repo": "https://github.com/Ortlinde/com.ortlinde.movement",
+            "docs": "https://github.com/Ortlinde/com.ortlinde.movement",
+            "changelog": "https://github.com/Ortlinde/com.ortlinde.movement/blob/main/CHANGELOG.md",
+            "category": "Gameplay"
+        },
+        {
+            "id": "com.ortlinde.editorhud",
+            "name": "Ortlinde Editor HUD",
+            "desc": "On-screen runtime debug overlay, driven from any script.",
+            "version": "v1.2.0",
+            "gitUrl": "https://github.com/Ortlinde/com.ortlinde.editorhud.git",
+            "repo": "https://github.com/Ortlinde/com.ortlinde.editorhud",
+            "docs": "https://github.com/Ortlinde/com.ortlinde.editorhud",
+            "changelog": "https://github.com/Ortlinde/com.ortlinde.editorhud/blob/main/CHANGELOG.md",
+            "category": "Editor Tools"
+        },
+        {
+            "id": "com.ortlinde.tween",
+            "name": "Ortlinde Tween",
+            "desc": "Allocation-free tweening with a fluent, chainable API.",
+            "version": "v0.4.0",
+            "gitUrl": "https://github.com/Ortlinde/com.ortlinde.tween.git",
+            "repo": "https://github.com/Ortlinde/com.ortlinde.tween",
+            "docs": "https://github.com/Ortlinde/com.ortlinde.tween",
+            "category": "Animation"
+        }
+    ]
+}
